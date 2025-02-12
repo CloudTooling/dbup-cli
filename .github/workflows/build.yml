@@ -48,7 +48,7 @@ jobs:
     name: Build results
     if: ${{ always() }}
     runs-on: ubuntu-latest
-    needs
+    needs:
       - Container
     steps:
       - run: exit 1
