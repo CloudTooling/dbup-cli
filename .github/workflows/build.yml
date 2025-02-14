@@ -25,14 +25,21 @@ jobs:
           echo "APP_VERSION=$APP_VERSION" >> $GITHUB_ENV
           echo "BUILD_DATE=$BUILD_DATE" >> $GITHUB_ENV
 
-      - name: Build image
-        id: build-image
-        uses: redhat-actions/buildah-build@v2
+      - name: Install a SQL Server suite of tools
+        uses: potatoqualitee/mssqlsuite@v1.8
         with:
-          image: cloudtooling/dbup-cli
-          tags: 'next ${{env.APP_VERSION}}_rc'
-          containerfiles: |
-            ./Dockerfile
+          install: sqlengine, sqlpackage
+          sa-password: Passw0rd
+
+      - name: Build Container Image
+        id: build-image
+        uses: docker/build-push-action@v6
+        with:
+          push: false
+          tags: |
+            cloudtooling/dbup-cli:next
+            cloudtooling/dbup-cli:${{github.run_id }}
+            cloudtooling/dbup-cli:${{env.APP_VERSION}}_rc
           build-args: |
             BUILD_DATE=${{env.BUILD_DATE}}
             APP_VERSION=${{env.APP_VERSION}}
@@ -48,16 +55,11 @@ jobs:
           password: ${{ secrets.DOCKER_HUB_TOKEN }}
         if: github.ref == 'refs/heads/develop'
 
-      - name: Install a SQL Server suite of tools
-        uses: potatoqualitee/mssqlsuite@v1.8
-        with:
-          install: sqlengine, sqlpackage
-          sa-password: Passw0rd
       - name: Run tests in container
         id: run-tests
         run: |
           connectionString="Data Source = localhost; User ID = sa; Password = Passw0rd; Max Pool Size = 1000"
-          docker run --network=host -e CONNSTR="$connectionString" -v $(pwd)/test:/src cloudtooling/dbup-cli:${{env.APP_VERSION}}_rc upgrade
+          docker run --network=host -e CONNSTR="$connectionString" -v $(pwd)/test:/src cloudtooling/dbup-cli:${{github.run_id }} upgrade
 
   Build-results:
     name: Build results
