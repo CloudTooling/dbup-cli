@@ -13,6 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - name: Write version vars
         id: version-vars
         run: |
@@ -23,6 +24,7 @@ jobs:
           echo "VERSION=$APP_VERSION" >> $GITHUB_ENV
           echo "APP_VERSION=$APP_VERSION" >> $GITHUB_ENV
           echo "BUILD_DATE=$BUILD_DATE" >> $GITHUB_ENV
+
       - name: Build image
         id: build-image
         uses: redhat-actions/buildah-build@v2
@@ -34,6 +36,7 @@ jobs:
           build-args: |
             BUILD_DATE=${{env.BUILD_DATE}}
             APP_VERSION=${{env.APP_VERSION}}
+
       - name: Push To Docker Hub
         id: push-to-dockerhub-preview
         uses: redhat-actions/push-to-registry@v2
@@ -44,6 +47,17 @@ jobs:
           username: ${{ vars.DOCKER_HUB_USER}}
           password: ${{ secrets.DOCKER_HUB_TOKEN }}
         if: github.ref == 'refs/heads/develop'
+
+      - name: Install a SQL Server suite of tools
+        uses: potatoqualitee/mssqlsuite@v1.8
+        with:
+          install: sqlengine, sqlpackage
+          sa-password: Passw0rd
+      - name: Run tests in container
+        id: run-tests
+        run: |
+          connectionString="Data Source = localhost; User ID = sa; Password = Passw0rd; Max Pool Size = 1000"
+          docker run --network=host -e CONNSTR="$connectionString" -v $(pwd)/test:/src cloudtooling/dbup-cli:${{env.APP_VERSION}}_rc upgrade
 
   Build-results:
     name: Build results
