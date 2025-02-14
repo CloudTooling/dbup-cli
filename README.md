@@ -8,5 +8,6 @@
 Run the scripts via docker:
 
 ```
-docker run -it --network=host -v $(pwd):/src cloudtooling/dbup-cli upgrade
+connectionString="Data Source = localhost; User ID = sa; Password = Passw0rd; Max Pool Size = 1000"
+docker run --network=host -e CONNSTR="$connectionString" -v $(pwd)/test:/src cloudtooling/dbup-cli upgrade
 ```
