@@ -60,8 +60,8 @@ jobs:
       - name: Deploy Container Image
         id: push-to-dockerhub-release
         run: |
-          docker push cloudtooling/data-anonymizer:next
-          docker push cloudtooling/data-anonymizer:${{env.APP_VERSION}}_rc
+          docker push cloudtooling/dbup-cli:next
+          docker push cloudtooling/dbup-cli:${{env.APP_VERSION}}_rc
         if: github.ref == 'refs/heads/develop'
 
   Build-results:
