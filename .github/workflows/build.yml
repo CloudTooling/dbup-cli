@@ -48,7 +48,7 @@ jobs:
         id: push-to-dockerhub-preview
         uses: redhat-actions/push-to-registry@v2
         with:
-          image: ${{ steps.build-image.outputs.image }}
+          image: cloudtooling/dbup-cli:${{env.APP_VERSION}}_rc
           tags: 'next ${{env.APP_VERSION}}_rc'
           registry: registry.hub.docker.com
           username: ${{ vars.DOCKER_HUB_USER}}
