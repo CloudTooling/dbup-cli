@@ -50,10 +50,9 @@ jobs:
           connectionString="Data Source = localhost; User ID = sa; Password = Passw0rd; Max Pool Size = 1000"
           docker run --network=host -e CONNSTR="$connectionString" -v $(pwd)/test:/src cloudtooling/dbup-cli:${{github.run_id }} upgrade
 
-      - name: Log in to GitHub container registry
+      - name: Log in to DockerHub container registry
         uses: docker/login-action@v3
         with:
-          registry: registry.hub.docker.com
           username: ${{ vars.DOCKER_HUB_USER}}
           password: ${{ secrets.DOCKER_HUB_TOKEN }}
         if: github.ref == 'refs/heads/develop'
