@@ -11,3 +11,10 @@ Run the scripts via docker:
 connectionString="Data Source = localhost; User ID = sa; Password = Passw0rd; Max Pool Size = 1000"
 docker run --network=host -e CONNSTR="$connectionString" -v $(pwd)/test:/src cloudtooling/dbup-cli upgrade
 ```
+
+If you want to use a custom working directory, use this as volume mount and provide the env var:
+
+
+connectionString="Data Source = localhost; User ID = sa; Password = Passw0rd; Max Pool Size = 1000"
+docker run --network=host -e CONNSTR="$connectionString" -e WORK_DIR=scripts/sql -v $(pwd):/scripts/sql cloudtooling/dbup-cli upgrade
+```
